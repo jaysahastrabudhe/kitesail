@@ -105,6 +105,7 @@ final class Watchdog {
         timer?.tolerance = 1   // lets macOS batch wake-ups (energy)
         Task { await refreshGroups() }
         clipboard.registerHotkey()
+        DesktopPrefs.apply()
         if UserDefaults.standard.bool(forKey: Prefs.alerts) { Self.requestNotifications() }
     }
 
@@ -115,6 +116,7 @@ final class Watchdog {
         if s.pressure == .normal { pressureSince = nil } else if pressureSince == nil { pressureSince = .now }
         if tick % 12 == 0 { Task { await refreshGroups(recordHistory: true) } }
         if tick % 720 == 1 { dailyBookkeeping(s) }   // on launch, then hourly
+        if tick % 120 == 0 { checkAccessoryBatteries() }   // every 10 min; IORegistry read only
         let sustained = pressureSince.map { Date.now.timeIntervalSince($0) >= 30 } ?? false
         guard sustained else { return }
         if UserDefaults.standard.bool(forKey: Prefs.guardOn) { runGuard() }
@@ -135,6 +137,20 @@ final class Watchdog {
         }
         history = next
         growing = found
+    }
+
+    // MARK: Low-battery alerts for Magic accessories
+
+    @ObservationIgnored private var batteryAlerted: [String: Date] = [:]
+
+    private func checkAccessoryBatteries() {
+        guard UserDefaults.standard.bool(forKey: Prefs.alerts) else { return }
+        for d in DeviceScanner.magicDevices() {
+            guard let p = d.lowest, p <= 15 else { continue }
+            if let last = batteryAlerted[d.id], Date.now.timeIntervalSince(last) < 6 * 3600 { continue }
+            batteryAlerted[d.id] = .now
+            Self.notify(title: "\(d.name) is at \(p)%", body: "Charge it soon so it doesn't die mid-task.")
+        }
     }
 
     // MARK: Weekly recap

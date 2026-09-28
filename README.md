@@ -42,6 +42,7 @@ Most "Mac cleaner" apps are heavy, nag you, and hide what they actually do. Kite
 | **Disk Map** | An animated treemap of any folder. Click to drill in, Quick Look anything, delete with a brick-shatter animation, or collect blocks in a **delete basket** and remove them in one go. |
 | **Clean Up** | App caches, logs, developer caches (Xcode DerivedData, simulators, npm, pip, Yarn), Mail downloads, old installers, Xcode device support, plus a Spotlight-powered **large files** list. |
 | **Duplicates** | Exact duplicates over 1 MB, found by size → first 64 KB → full SHA-256. Skips APFS clones and hard links, since deleting those frees nothing. "Keep newest" per set. |
+| **System Data** | Explains the mystery "System Data" in Settings: local Time Machine snapshots (remove them safely), purgeable space and swap files. |
 | **Uninstaller** | Removes an app *and* its leftovers (Application Support, Caches, Preferences, Containers, saved state, launch agents). Near-matches that could belong to a sibling app start unchecked. |
 
 <p align="center"><img src="docs/screenshots/disk.jpg" width="440" alt="Disk Map"> <img src="docs/screenshots/cleanup.jpg" width="440" alt="Clean Up"></p>
@@ -53,7 +54,7 @@ Most "Mac cleaner" apps are heavy, nag you, and hide what they actually do. Kite
 | **Memory Guard** | Opt-in. When pressure stays *Elevated* or *Critical*, it quits the heaviest app you haven't touched in a while: one app per minute, never the one you're using, never your keep list, never an app playing audio or exporting. It pauses while Keep Awake is on. |
 | **Quit All** | Quit every app except your keep list, from the app, the menu bar or ⌘K. |
 | **Leak watch** | Flags apps whose memory keeps climbing for 30+ minutes. |
-| **Energy** | CPU per app, heat throttling on fanless Macs, battery health and cycle count, and **Keep Awake** (Amphetamine-style). |
+| **Energy** | CPU per app, real **temperatures** (CPU, chip, SSD, battery), heat throttling on fanless Macs, battery health and cycle count, and **Keep Awake** (Amphetamine-style). |
 | **Startup** | Third-party launch agents and daemons with their RAM use, on/off switches, and **leftovers from apps you already deleted**. |
 
 <p align="center"><img src="docs/screenshots/memory.jpg" width="440" alt="Memory"> <img src="docs/screenshots/apps.jpg" width="440" alt="Apps and Memory Guard"></p>
@@ -64,6 +65,9 @@ Most "Mac cleaner" apps are heavy, nag you, and hide what they actually do. Kite
 |---|---|
 | **Display** | Resolution and refresh rate, plus **HiDPI Booster** for sharp, Retina-style text on 1080p and 1440p monitors (renders at 2× and scales down). For external monitors: **brightness, contrast, volume and input** over DDC. |
 | **Clipboard history** | Press ⇧⌘V (or ⌥⌘V) anywhere. Search, pin, and paste straight into the app you were using. Skips password managers and copies marked secret, keeps history in memory, and saves only pins. |
+| **Devices** | Your charger's real wattage and what's actually flowing into the battery, every USB device's true speed (it warns when a drive is stuck at USB 2 speed, usually a bad cable), and Bluetooth batteries for AirPods, Magic Mouse, Keyboard and Trackpad. |
+| **Desktop** | Opt-in: **window snapping** with Rectangle's shortcuts (⌃⌥ + arrows, ↩, C, D/F/G), **menu bar tidy** to hide icons behind a divider, and **smooth mouse scrolling** with a separate scroll direction for the mouse. The trackpad is never touched. |
+| **Security** | A checkup of FileVault, the firewall, Gatekeeper, System Integrity Protection and automatic updates, with a button that opens the right Settings page for anything that's off. |
 | **Command palette** | ⌘K for everything: "quit dia", "keep awake 1 hour", "clean caches", "find duplicates"… |
 | **Menu bar** | Memory at a glance, top apps, Keep Awake, clipboard, Quit All. |
 

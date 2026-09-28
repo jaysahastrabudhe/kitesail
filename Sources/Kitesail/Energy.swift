@@ -74,6 +74,8 @@ final class EnergyModel {
     var top: [CPUShare] = []
     var thermal = ProcessInfo.processInfo.thermalState
     var battery: BatteryInfo? = SystemReader.battery()
+    var temperatures: [TemperatureGroup] = []
+    var cpuTempHistory: [Double] = []
 
     @ObservationIgnored private var lastTicks = SystemReader.cpuTicks()
     @ObservationIgnored private var lastCPU: [String: UInt64] = [:]
@@ -99,6 +101,11 @@ final class EnergyModel {
                 let pct = Double(g.cpuNanos - prev) / elapsed * 100
                 if pct >= 0.5 { shares.append(CPUShare(id: g.id, name: g.name, appPath: g.appPath, percent: pct, pids: g.pids)) }
             }
+        }
+        let temps = await Task.detached(priority: .utility) { Sensors.read() }.value
+        temperatures = temps
+        if let cpu = temps.first(where: { $0.id == "CPU" })?.celsius {
+            cpuTempHistory = Array((cpuTempHistory + [cpu]).suffix(60))
         }
         let firstSample = lastCPU.isEmpty
         lastCPU = next
@@ -166,6 +173,7 @@ struct EnergyView: View {
                     .frame(width: 300)
                 }
                 .fixedSize(horizontal: false, vertical: true)
+                TemperatureCard(groups: model.temperatures, history: model.cpuTempHistory)
                 KeepAwakeCard(awake: awake)
                 topCard
             }

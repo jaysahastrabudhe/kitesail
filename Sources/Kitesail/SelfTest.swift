@@ -95,6 +95,20 @@ enum SelfTest {
         let after = SystemReader.Ticks(user: 10, system: 0, idle: 10, nice: 0)
         precondition(SystemReader.delta(before, after) == (busy: 20, total: 60))
 
+        // Sensors: known names map to groups, unknown ones are ignored.
+        precondition(Sensors.group(for: "PMU tdie3")?.id == "CPU" && Sensors.group(for: "NAND CH0 temp")?.id == "SSD")
+        precondition(Sensors.group(for: "PMU tdev1") == nil)
+
+        // New tools: snapshot parsing, Bluetooth battery parsing, window-snap geometry.
+        let snaps = SystemDataScanner.parseSnapshots("Snapshots for disk /:\ncom.apple.TimeMachine.2026-09-28-101010.local\ncom.apple.TimeMachine.2026-09-27-090000.local")
+        precondition(snaps.count == 2 && snaps[0] > snaps[1])
+        let bt = DeviceScanner.parseBluetooth(Data(#"{"SPBluetoothDataType":[{"device_connected":[{"AirPods Pro":{"device_batteryLevelLeft":"80%","device_batteryLevelRight":"75%","device_minorType":"Headphones"}}]}]}"#.utf8))
+        precondition(bt.first?.lowest == 75 && bt.first?.levels.count == 2)
+        let screen = CGRect(x: 0, y: 25, width: 1200, height: 800)
+        precondition(SnapTarget.leftHalf.frame(in: screen) == CGRect(x: 0, y: 25, width: 600, height: 800))
+        precondition(SnapTarget.lastThird.frame(in: screen).maxX == 1200)
+        precondition(USBDevice(id: 1, name: "SSD", vendor: nil, speed: 2, isStorage: true).warning != nil)
+
         // Live readers return sane values on this machine.
         let snap = MemoryReader.snapshot()
         precondition(snap != nil && snap!.total > 0 && snap!.used <= snap!.total)

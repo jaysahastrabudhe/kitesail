@@ -58,7 +58,7 @@ struct KitesailApp: App {
 // MARK: - Navigation
 
 enum Pane: String, CaseIterable, Identifiable, Hashable {
-    case overview, disk, cleanup, duplicates, uninstaller, memory, apps, energy, startup, display, clipboard
+    case overview, disk, cleanup, duplicates, uninstaller, systemData, memory, apps, energy, startup, display, devices, desktop, clipboard, security
     var id: Self { self }
 
     var title: String {
@@ -67,6 +67,7 @@ enum Pane: String, CaseIterable, Identifiable, Hashable {
         case .duplicates: "Duplicates"; case .uninstaller: "Uninstaller"
         case .memory: "Memory"; case .apps: "Apps"; case .energy: "Energy"; case .startup: "Startup"
         case .display: "Display"; case .clipboard: "Clipboard"
+        case .systemData: "System Data"; case .devices: "Devices"; case .desktop: "Desktop"; case .security: "Security"
         }
     }
     var symbol: String {
@@ -75,6 +76,8 @@ enum Pane: String, CaseIterable, Identifiable, Hashable {
         case .cleanup: "sparkles"; case .duplicates: "doc.on.doc"; case .uninstaller: "shippingbox"
         case .memory: "memorychip"; case .apps: "square.stack.3d.up"
         case .energy: "bolt"; case .startup: "power"; case .display: "display"; case .clipboard: "list.clipboard"
+        case .systemData: "internaldrive"; case .devices: "cable.connector"; case .desktop: "macwindow.on.rectangle"
+        case .security: "lock.shield"
         }
     }
 }
@@ -92,6 +95,9 @@ final class Store {
     let cleanup = CleanupModel()
     let memory = MemoryModel()
     let display = DisplayModel()
+    let systemData = SystemDataModel()
+    let devices = DevicesModel()
+    let security = SecurityModel()
 }
 
 struct RootView: View {
@@ -123,6 +129,7 @@ struct RootView: View {
                     row(.cleanup, detail: cleanup.measured && cleanup.reclaimable > 0 ? formatBytes(cleanup.reclaimable) : nil)
                     row(.duplicates)
                     row(.uninstaller)
+                    row(.systemData)
                 }
                 Section("Performance") {
                     row(.memory, detail: watchdog.snapshot.map { formatGB($0.used) })
@@ -132,7 +139,10 @@ struct RootView: View {
                 }
                 Section("Tools") {
                     row(.display)
+                    row(.devices)
+                    row(.desktop)
                     row(.clipboard)
+                    row(.security)
                 }
             }
             .listStyle(.sidebar)
@@ -157,6 +167,10 @@ struct RootView: View {
                 case .startup: StartupView(model: startup)
                 case .display: DisplayView(model: display)
                 case .clipboard: ClipboardView(history: watchdog.clipboard)
+                case .systemData: SystemDataView(model: store.systemData)
+                case .devices: DevicesView(model: store.devices)
+                case .desktop: DesktopView()
+                case .security: SecurityView(model: store.security)
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
@@ -478,7 +492,9 @@ enum SnapshotMode {
         loadSampleClips(into: clipboard)
         let dir = URL(fileURLWithPath: args[i + 1])
         try? await Task.sleep(for: .seconds(1.5))
-        for p in Pane.allCases {
+        // Optional third argument: comma-separated pane names to capture (default: all).
+        let only = i + 2 < args.count ? Set(args[i + 2].split(separator: ",").map(String.init)) : nil
+        for p in Pane.allCases where only?.contains(p.rawValue) ?? true {
             NSApp.activate()
             select(p)
             try? await Task.sleep(for: .seconds(p == .disk ? 10 : 3))
