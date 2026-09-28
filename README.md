@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/jaysahastrabudhe/kitesail/releases/latest"><b>Download the latest DMG</b></a> ·
+  <a href="https://github.com/jaysahastrabudhe/kitesail/releases/latest/download/Kitesail.dmg"><b>Download Kitesail.dmg</b></a> ·
   <a href="https://buymeacoffee.com/LCIJOxlNF">☕ Support development</a>
 </p>
 
@@ -71,7 +71,17 @@ Most "Mac cleaner" apps are heavy, nag you, and hide what they actually do. Kite
 
 ## Install
 
-1. Download **Kitesail-1.0.dmg** from [Releases](https://github.com/jaysahastrabudhe/kitesail/releases/latest) and drag Kitesail to Applications.
+**Option 1: one line in Terminal (easiest)**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/jaysahastrabudhe/kitesail/main/install.sh | sh
+```
+
+This downloads the latest release, installs it to Applications and opens it. Files fetched this way aren't quarantined, so there's no "unidentified developer" prompt. You can [read the script](install.sh) first; it's short.
+
+**Option 2: the disk image**
+
+1. Download **Kitesail.dmg** from [Releases](https://github.com/jaysahastrabudhe/kitesail/releases/latest), open it, and drag Kitesail onto the Applications folder.
 2. The first time, **right-click Kitesail → Open**. If macOS still refuses, go to *System Settings → Privacy & Security* and click **Open Anyway**. This is needed because Kitesail is signed ad hoc rather than notarized with a paid Apple Developer ID.
 
    Or in Terminal:
@@ -79,7 +89,7 @@ Most "Mac cleaner" apps are heavy, nag you, and hide what they actually do. Kite
    xattr -dr com.apple.quarantine /Applications/Kitesail.app
    ```
 
-Requires **macOS 26 (Tahoe) or later** on **Apple Silicon**.
+Requires **macOS 26 (Tahoe) or later** on **Apple Silicon**. After an update, macOS may ask you to allow Full Disk Access and Accessibility again.
 
 ## Permissions
 
@@ -103,7 +113,7 @@ No Xcode needed; Command Line Tools are enough.
 git clone https://github.com/jaysahastrabudhe/kitesail.git
 cd kitesail
 ./build.sh              # → build/Kitesail.app
-./make-dmg.sh           # → build/Kitesail-<version>.dmg
+./make-dmg.sh           # → styled drag-to-Applications build/Kitesail-<version>.dmg
 build/Kitesail.app/Contents/MacOS/Kitesail --selftest
 ```
 
