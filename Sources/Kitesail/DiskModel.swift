@@ -92,13 +92,15 @@ enum DiskScanner {
         return total
     }
 
-    /// TCC.db is only readable by processes that hold Full Disk Access.
+    /// Full Disk Access check: these folders exist on every Mac but refuse to list without it.
+    /// (The old probe, ~/Library/Application Support/com.apple.TCC/TCC.db, no longer exists on macOS 27.)
+    static let protectedProbes = ["Library/Safari", "Library/Mail", "Library/Messages", "Library/Cookies", "Library/Suggestions"]
+
     static func hasFullDiskAccess() -> Bool {
-        let probe = FileManager.default.homeDirectoryForCurrentUser
-            .appending(path: "Library/Application Support/com.apple.TCC/TCC.db")
-        guard let handle = try? FileHandle(forReadingFrom: probe) else { return false }
-        try? handle.close()
-        return true
+        let home = FileManager.default.homeDirectoryForCurrentUser
+        let existing = protectedProbes.map { home.appending(path: $0).path }.filter { FileManager.default.fileExists(atPath: $0) }
+        guard !existing.isEmpty else { return true }   // nothing protected on this Mac, so nothing to unlock
+        return existing.contains { (try? FileManager.default.contentsOfDirectory(atPath: $0)) != nil }
     }
 
     static func volume(for url: URL) -> (total: Int64, available: Int64)? {
